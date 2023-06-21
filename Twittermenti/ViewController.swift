@@ -41,15 +41,23 @@ class ViewController: UIViewController {
       }
     }
     
+    let sentimentClassifier = TweetSentimentClassifier()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         let swifter = Swifter(consumerKey: apiKey, consumerSecret: apiSecret)
         swifter.searchTweet(using: "@Apple", lang: "en", count: 100, tweetMode: .extended, success: { (results, metadata) in
             print(results)
+            
+            if let tweet = results[0]["full_text"].string {
+                print(tweet)
+            }
         }) { (error) in
             print("There was an error with the Twitter API Request, \(error)")
         }
+        
+        let prediction = try! sentimentClassifier.prediction(text: "@Apple is a terrible company!")
+        print(prediction.label)
     }
 
     @IBAction func predictPressed(_ sender: Any) {
