@@ -22,6 +22,4 @@ build/
 
 # Backup files
 *~.nib
-WhatFlower/FlowerClassifier.mlmodel
-Twittermenti/TweetSentimentClassifier.mlmodel
 Twittermenti/Secrets.plist
