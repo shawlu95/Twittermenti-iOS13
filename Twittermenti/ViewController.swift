@@ -45,49 +45,60 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let swifter = Swifter(consumerKey: apiKey, consumerSecret: apiSecret)
-        swifter.searchTweet(using: "@Apple", lang: "en", count: 100, tweetMode: .extended, success: { (results, metadata) in
-            print(results)
-            
-            var tweets = [TweetSentimentClassifierInput]()
-            for i in 0..<100 {
-                if let tweet = results[0]["full_text"].string {
-                    tweets.append(TweetSentimentClassifierInput(text: tweet))
-                }
-            }
-            print(tweets)
-        }) { (error) in
-            print("There was an error with the Twitter API Request, \(error)")
-            var score = 0
-            var tweets = [TweetSentimentClassifierInput]()
-            tweets.append(TweetSentimentClassifierInput(text: "I love Apple"))
-            tweets.append(TweetSentimentClassifierInput(text: "I hate Apple"))
-            tweets.append(TweetSentimentClassifierInput(text: "I am neutral about Apple"))
-            
-            do {
-                let predictions = try self.sentimentClassifier.predictions(inputs: tweets)
-                for prediction in predictions {
-                    print(prediction.label)
-                    let sentiment = prediction.label
-                    if sentiment == "Pos" {
-                        score += 1
-                    } else if sentiment == "Neg" {
-                        score -= 1
-                    }
-                }
-                print(score)
-            
-            } catch {
-                print("There was an error with making a prediction, \(error)")
-            }
-        }
-        
-        let prediction = try! sentimentClassifier.prediction(text: "@Apple is a terrible company!")
-        print(prediction.label)
     }
 
     @IBAction func predictPressed(_ sender: Any) {
-    
+        if let searchText = textField.text {
+            
+            let swifter = Swifter(consumerKey: apiKey, consumerSecret: apiSecret)
+            swifter.searchTweet(using: "@Apple", lang: "en", count: 100, tweetMode: .extended, success: { (results, metadata) in
+                print(results)
+                
+                var tweets = [TweetSentimentClassifierInput]()
+                for i in 0..<100 {
+                    if let tweet = results[0]["full_text"].string {
+                        tweets.append(TweetSentimentClassifierInput(text: tweet))
+                    }
+                }
+                print(tweets)
+            }) { (error) in
+                print("There was an error with the Twitter API Request, \(error)")
+                var score = 0
+                var tweets = [TweetSentimentClassifierInput]()
+                tweets.append(TweetSentimentClassifierInput(text: "I love Apple"))
+                tweets.append(TweetSentimentClassifierInput(text: "I hate Apple"))
+                tweets.append(TweetSentimentClassifierInput(text: "I am neutral about Apple"))
+                
+                do {
+                    let predictions = try self.sentimentClassifier.predictions(inputs: tweets)
+                    for prediction in predictions {
+                        print(prediction.label)
+                        let sentiment = prediction.label
+                        if sentiment == "Pos" {
+                            score += 1
+                        } else if sentiment == "Neg" {
+                            score -= 1
+                        }
+                    }
+                    print(score)
+                    
+                    if score > 0 {
+                        self.sentimentLabel.text = "😍"
+                    } else if score == 0 {
+                        self.sentimentLabel.text = "😐"
+                    } else {
+                        self.sentimentLabel.text = "☹️"
+                    }
+                
+                    
+                } catch {
+                    print("There was an error with making a prediction, \(error)")
+                }
+            }
+            
+            let prediction = try! sentimentClassifier.prediction(text: "@Apple is a terrible company!")
+            print(prediction.label)
+        }
     
     }
     
